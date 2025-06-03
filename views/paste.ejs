@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>
+    <%= paste.title || 'Paste' %> - Code Share
+  </title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <link rel="icon" href="/images/icon.png" />
+
+  <!-- Carga el core de highlight.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/monokai.min.css">
+  
+  <!-- Librerías de highlight -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/html.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/css.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/shell.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/java.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/php.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/xml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/sql.min.js"></script>
+</head>
+
+<body>
+  <div class="container">
+    <% if (paste.isLocal) { %>
+      <div class="paste-container">
+        <div class="paste-header">
+          <h1 class="paste-title">Paste no encontrado</h1>
+        </div>
+        <div class="text-content">
+          <p>El paste con ID <strong>
+              <%= paste.urlId %>
+            </strong> no existe o fue borrado.</p>
+          <p><a href="/" class="button">← Volver al inicio</a></p>
+        </div>
+      </div>
+      <% } else { %>
+        <div class="paste-container">
+          <div class="paste-header">
+            <div>
+              <h1 class="paste-title">
+                <%= paste.title || 'Sin título' %>
+              </h1>
+              <div class="paste-meta">
+                <span>📅 <%= new Date(paste.createdAt).toLocaleString() %></span>
+                <% if (paste.userId) { %>
+                  <span>👤 <%= paste.userName %></span>
+                  <% } %>
+                    <button class="copy-btn" onclick="copyCode()">📋 Copiar</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Contenedor único para todo el contenido -->
+          <div class="content-container" style="position: relative;">
+            <div class="language-selector" id="languageDisplay">
+              <% if (paste.language) { %>
+                <%= paste.language %>
+                  <% } else { %>
+                    plaintext
+                    <% } %>
+            </div>
+
+            <div class="content-display">
+              <pre><code id="codeContent" class="<% if (paste.language) { %>language-<%= paste.language %><% } else { %>language-plaintext<% } %>"><%= paste.content %></code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="actions" style="text-align: center; margin: 30px 0;">
+          <a href="/" class="button">Crear nuevo paste</a>
+        </div>
+        <% } %>
+  </div>
+<script>
+  window.pasteLang = "<%= paste.language || '' %>";
+</script>
+<script src="/js/paste.js"></script>
+</body>
+</html>

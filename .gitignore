@@ -1,0 +1,17 @@
+# Archivos sensibles
+firebase-creds.json
+.env
+*.key
+*.pem
+
+# Dependencias
+node_modules/
+
+# Logs y temporales
+*.log
+*.tmp
+.DS_Store
+
+# Entornos
+.vscode/
+.idea/

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Code Share</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/vs.min.css">
+  <link rel="stylesheet" href="/css/style.css" />
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Roboto:wght@300;400;500;700&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/monokai.min.css">
+  <link rel="icon" href="/images/icon.png" />
+
+</head>
+
+<body>
+  <div class="container">
+    <header class="header-cont">
+      <div class="header-left">
+        <h1>Code Share</h1>
+        <p>Comparte código y texto fácilmente</p>
+      </div>
+      <div class="header-right">
+        <% if (user) { %>
+          <div class="user-info">
+            <img src="<%= user.picture %>" alt="Foto de perfil" class="user-avatar" />
+            <span>Hola, <%= user.name %></span>
+            <button id="logout-btn" class="button danger">
+              <i class="material-icons">logout</i> Salir
+            </button>
+          </div>
+          <% } else { %>
+            <button id="google-login" class="button google-btn">
+              <img src="../images/g-icon.png" alt="Google" class="provider-logo" />
+              Iniciar sesión con Google
+            </button>
+            <% } %>
+      </div>
+    </header>
+
+    <form id="paste-form">
+      <input type="text" name="title" placeholder="Título (opcional)" aria-label="Título del paste" />
+
+      <div class="editor-container">
+        <textarea id="paste-content" name="content" class="smart-editor" placeholder="Escribe texto o código aquí..."
+          spellcheck="false"></textarea>
+        <div class="line-numbers" id="line-numbers">1</div>
+      </div>
+
+      <div id="captcha-container" class="captcha-container" style="display: none;">
+        <div class="g-recaptcha" data-sitekey="6Le4jUsrAAAAAA_WoN4Ht1MKzmyCGuMcvYolwXdL"></div>
+      </div>
+
+      <div class="actions">
+        <button type="submit" class="button">Crear Paste</button>
+      </div>
+    </form>
+
+    <div id="paste-list" class="paste-history"></div>
+
+    <div class="actions">
+      
+      <button id="clear-history" class="button danger">Borrar historial</button>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/script.js"></script>
+  <script src="/js/index.js"></script>
+
+</body>
+
+</html>
