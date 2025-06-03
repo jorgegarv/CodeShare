@@ -174,3 +174,6 @@ app.get('/api/pastes', checkAuth, async (req, res) => {
     res.status(500).json({ error: "Error al obtener pastes" });
   }
 });
+
+const PORT = process.env.PORT || 4000;
+app.listen(PORT);
