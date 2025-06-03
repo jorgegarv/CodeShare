@@ -1,3 +1,5 @@
+![CodeShare](https://socialify.git.ci/jorgegarv/CodeShare/image?font=KoHo&language=1&name=1&owner=1&pattern=Brick+Wall&stargazers=1&theme=Light)
+
 Code Share es una aplicación web que permite a los usuarios compartir rápidamente fragmentos de código o texto con otros. Ofrece resaltado de sintaxis automático, historial de pastes y autenticación con Google.
 
 Características principales
