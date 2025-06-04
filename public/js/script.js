@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Manejo de CAPTCHA
   let captchaToken = '';
-  if (pasteCount >= MAX_PASTES_BEFORE_CAPTCHA) {
+  
     if (!window.grecaptcha) {
       return showNotification('Error al cargar el CAPTCHA', 'error');
     }
@@ -36,7 +36,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       captchaContainer.style.display = 'block';
       return showNotification('Por favor completa el CAPTCHA', 'error');
     }
-  }
 
   // Crear objeto de datos
   const data = {

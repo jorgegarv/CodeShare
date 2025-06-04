@@ -32,6 +32,12 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 app.use(cookieParser());
 app.set('view engine', 'ejs');
+app.set('trust proxy', true); 
+
+app.use((req, res, next) => {
+  const clientIp = req.headers['x-forwarded-for'] || req.ip;
+  next();
+});
 
 const checkAuth = async (req, res, next) => {
   const sessionCookie = req.cookies.session || '';
@@ -46,9 +52,19 @@ const checkAuth = async (req, res, next) => {
 
 const createLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 12,
+  max: 10,
   message: { error: 'Demasiados pastes creados. Intenta en 15 minutos.' }
 });
+
+// Limpiar contadores antiguos cada hora
+setInterval(() => {
+  const oneHourAgo = Date.now() - (60 * 60 * 1000);
+  for (const [ip, data] of attemptsByIP.entries()) {
+    if (data.lastAttempt < oneHourAgo) {
+      attemptsByIP.delete(ip);
+    }
+  }
+}, 60 * 60 * 1000);
 
 app.use((req, res, next) => {
   res.locals.sanitizeCode = (code) => {
@@ -72,27 +88,28 @@ app.get('/', checkAuth, (req, res) => {
   res.render('index', { user: req.user });
 });
 
-app.post('/create', createLimiter, checkAuth, async (req, res) => {
+app.post('/create', createLimiter,checkAuth, async (req, res) => {
   try {
     let { content, title = 'Sin título', captcha, type = 'text' } = req.body;
 
     if (!content || typeof content !== 'string') throw new Error('Contenido requerido');
     if (typeof title !== 'string') throw new Error('Título inválido');
 
-    if (captcha) {
-      const verificationUrl = 'https://www.google.com/recaptcha/api/siteverify';
+    if (!captcha || typeof captcha !== 'string') {
+      return res.status(400).json({ error: 'CAPTCHA requerido' });
+    }
 
-      const params = new URLSearchParams();
-      params.append('secret', RECAPTCHA_SECRET);
-      params.append('response', captcha);
-      params.append('remoteip', req.ip);
+    const verificationUrl = 'https://www.google.com/recaptcha/api/siteverify';
+    const params = new URLSearchParams();
+    params.append('secret', RECAPTCHA_SECRET);
+    params.append('response', captcha);
+    params.append('remoteip', req.ip);
 
-      const response = await axios.post(verificationUrl, params);
-      const data = response.data;
+    const response = await axios.post(verificationUrl, params);
+    const data = response.data;
 
-      if (!data.success) {
-        return res.status(400).json({ error: 'CAPTCHA no válido' });
-      }
+    if (!data.success) {
+      return res.status(400).json({ error: 'CAPTCHA no válido' });
     }
 
     content = content.trim().substring(0, 10000);
@@ -117,6 +134,7 @@ app.post('/create', createLimiter, checkAuth, async (req, res) => {
     }
 
     await db.collection('pastes').doc(urlId).set(pasteData);
+    
     res.json({ urlId, paste: pasteData });
 
   } catch (error) {
