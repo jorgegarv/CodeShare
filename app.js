@@ -34,11 +34,6 @@ app.use(cookieParser());
 app.set('view engine', 'ejs');
 app.set('trust proxy', true); 
 
-app.use((req, res, next) => {
-  const clientIp = req.headers['x-forwarded-for'] || req.ip;
-  next();
-});
-
 const checkAuth = async (req, res, next) => {
   const sessionCookie = req.cookies.session || '';
   try {
@@ -90,6 +85,8 @@ app.get('/', checkAuth, (req, res) => {
 
 app.post('/create', createLimiter,checkAuth, async (req, res) => {
   try {
+    const clientIp = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.ip;
+
     let { content, title = 'Sin título', captcha, type = 'text' } = req.body;
 
     if (!content || typeof content !== 'string') throw new Error('Contenido requerido');
@@ -103,7 +100,7 @@ app.post('/create', createLimiter,checkAuth, async (req, res) => {
     const params = new URLSearchParams();
     params.append('secret', RECAPTCHA_SECRET);
     params.append('response', captcha);
-    params.append('remoteip', req.ip);
+    params.append('remoteip', clientIp);
 
     const response = await axios.post(verificationUrl, params);
     const data = response.data;
@@ -123,7 +120,7 @@ app.post('/create', createLimiter,checkAuth, async (req, res) => {
       urlId,
       createdAt: new Date().toISOString(),
       public: true,
-      ip: req.ip
+      ip: clientIp
     };
 
     if (req.user) {
